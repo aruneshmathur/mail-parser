@@ -246,6 +246,7 @@ class MailParser(object):
         self._attachments = []
         self._text_plain = []
         self._text_html = []
+        self._other_content = []
         self._defects = []
         self._defects_categories = set()
         self._has_defects = False
@@ -402,8 +403,10 @@ class MailParser(object):
                     if payload:
                         if p.get_content_subtype() == 'html':
                             self._text_html.append(payload)
-                        else:
+                        elif p.get_content_subtype() == 'plain':
                             self._text_plain.append(payload)
+                        else:
+                            self._other_content.append(payload)
         else:
             # Parsed object mail with all parts
             self._mail = self._make_mail()
@@ -524,11 +527,11 @@ class MailParser(object):
     @property
     def body(self):
         """
-        Return all text plain and text html parts of mail delimited from string
-        "--- mail_boundary ---"
+        Return all text plain text, html, and other parts of mail delimited
+        from string "--- mail_boundary ---"
         """
         return "\n--- mail_boundary ---\n".join(
-            self.text_plain + self.text_html)
+            self.text_plain + self.text_html + self.other_content)
 
     @property
     def headers(self):
@@ -560,6 +563,13 @@ class MailParser(object):
         Return a list of all text html parts of email.
         """
         return self._text_html
+
+    @property
+    def other_content(self):
+        """
+        Return a list of all non plain and html parts of email.
+        """
+        return self._other_content
 
     @property
     def date(self):
