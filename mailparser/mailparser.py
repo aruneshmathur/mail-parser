@@ -402,11 +402,17 @@ class MailParser(object):
                         p.get_payload(decode=True), encoding=charset)
                     if payload:
                         if p.get_content_subtype() == 'html':
-                            self._text_html.append(payload)
+                            self._text_html.append({
+                                "payload": payload,
+                                "charset": charset})
                         elif p.get_content_subtype() == 'plain':
-                            self._text_plain.append(payload)
+                            self._text_plain.append({
+                                "payload": payload,
+                                "charset": charset})
                         else:
-                            self._other_content.append(payload)
+                            self._other_content.append({
+                                "payload": payload,
+                                "charset": charset})
         else:
             # Parsed object mail with all parts
             self._mail = self._make_mail()
@@ -527,11 +533,9 @@ class MailParser(object):
     @property
     def body(self):
         """
-        Return all text plain text, html, and other parts of mail delimited
-        from string "--- mail_boundary ---"
+        Return all text plain text, html, and other parts of mail
         """
-        return "\n--- mail_boundary ---\n".join(
-            self.text_plain + self.text_html + self.other_content)
+        return self.text_plain + self.text_html + self.other_content
 
     @property
     def headers(self):
@@ -553,21 +557,22 @@ class MailParser(object):
     @property
     def text_plain(self):
         """
-        Return a list of all text plain parts of email.
+        Return a list of all text plain parts of email with their encoding
         """
         return self._text_plain
 
     @property
     def text_html(self):
         """
-        Return a list of all text html parts of email.
+        Return a list of all text html parts of email with their encoding
         """
         return self._text_html
 
     @property
     def other_content(self):
         """
-        Return a list of all non plain and html parts of email.
+        Return a list of all non plain and html parts of email with their
+        encoding
         """
         return self._other_content
 
