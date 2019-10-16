@@ -412,7 +412,8 @@ class MailParser(object):
                         else:
                             self._other_content.append({
                                 "payload": payload,
-                                "charset": charset})
+                                "charset": charset,
+                                "content-type": p.get_content_subtype()})
         else:
             # Parsed object mail with all parts
             self._mail = self._make_mail()
